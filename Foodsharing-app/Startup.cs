@@ -1,3 +1,4 @@
+using Foodsharing_app.Filters;
 using Foodsharing_app.Models;
 using Foodsharing_app.Services;
 using Microsoft.AspNetCore.Builder;
@@ -21,17 +22,43 @@ namespace Foodsharing_app
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<FoodSharingDatabaseSettings>(
-                Configuration.GetSection(nameof(FoodSharingDatabaseSettings)));
-            services.AddSingleton<IFoodSharingDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<FoodSharingDatabaseSettings>>().Value);
+            RegisterDatabaseSettings(services);
+            RegisterJwtSettings(services);
 
+            RegisterServices(services);
+            RegisterScopedServices(services);
+
+            services.AddControllers();
+        }
+
+        private void RegisterScopedServices(IServiceCollection services)
+        {
+            services.AddScoped<UserAuthorizationFilter>();
+            services.AddScoped<AdminAuthorizationFilter>();
+        }
+
+        private static void RegisterServices(IServiceCollection services)
+        {
             services.AddSingleton<DatabaseService>();
             services.AddSingleton<FoodItemService>();
             services.AddSingleton<UserService>();
             services.AddSingleton<AuthorizationService>();
-            
-            services.AddControllers();
+        }
+
+        private void RegisterJwtSettings(IServiceCollection services)
+        {
+            services.Configure<FoodSharingJwtSettings>(
+                Configuration.GetSection(nameof(FoodSharingJwtSettings)));
+            services.AddSingleton<IFoodSharingJwtSettings>(sp =>
+                sp.GetRequiredService<IOptions<FoodSharingJwtSettings>>().Value);
+        }
+
+        private void RegisterDatabaseSettings(IServiceCollection services)
+        {
+            services.Configure<FoodSharingDatabaseSettings>(
+                Configuration.GetSection(nameof(FoodSharingDatabaseSettings)));
+            services.AddSingleton<IFoodSharingDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<FoodSharingDatabaseSettings>>().Value);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

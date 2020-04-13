@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Foodsharing_app.Filters;
 using Foodsharing_app.Models;
 using Foodsharing_app.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +9,12 @@ namespace Foodsharing_app.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ServiceFilter(typeof(UserAuthorizationFilter))]
     public class FoodItemController : Controller
     {
         private readonly FoodItemService _foodItemService;
 
-        public FoodItemController([FromBody] FoodItemService foodItemService)
+        public FoodItemController(FoodItemService foodItemService)
         {
             _foodItemService = foodItemService;
         }
