@@ -1,0 +1,11 @@
+{
+  "Name": "Bananen",
+  "Description": "Leckere Bananen",
+  "BestBefore": "2020-04-30T00:00:00+00:00",
+  "InsertedAt": "2020-04-12T20:11:46+00:00",
+  "InsertedBy": "TestUser",
+  "Coordinates": [
+        50.857870,
+        7.222032
+      ]
+}
