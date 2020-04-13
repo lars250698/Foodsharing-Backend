@@ -7,12 +7,9 @@
 
     <ItemGroup>
       <PackageReference Include="BCrypt" Version="1.0.0" />
+      <PackageReference Include="JWT" Version="6.1.4" />
       <PackageReference Include="MongoDB.Bson" Version="2.10.3" />
       <PackageReference Include="MongoDB.Driver" Version="2.10.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Exceptions" />
     </ItemGroup>
 
 

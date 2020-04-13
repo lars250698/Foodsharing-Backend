@@ -29,6 +29,7 @@ namespace Foodsharing_app
             services.AddSingleton<DatabaseService>();
             services.AddSingleton<FoodItemService>();
             services.AddSingleton<UserService>();
+            services.AddSingleton<AuthorizationService>();
             
             services.AddControllers();
         }
