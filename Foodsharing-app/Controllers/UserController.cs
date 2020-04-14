@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Foodsharing_app.Filters;
 using Foodsharing_app.Models;
 using Foodsharing_app.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,7 @@ namespace Foodsharing_app.Controllers
         [HttpPost]
         public User CreateUser([FromBody] User user, [FromQuery] string password) =>
             _userService.CreateUser(user, password);
-
+        
         [HttpGet]
         [Route("{id}")]
         public User GetUserById([FromRoute] string id) =>
@@ -35,8 +36,8 @@ namespace Foodsharing_app.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [AuthorizedAdmin]
         public void DeleteUser([FromRoute] string id) =>
             _userService.Remove(id);
-
     }
 }

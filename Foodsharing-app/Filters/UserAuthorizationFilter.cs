@@ -1,5 +1,7 @@
+using System;
 using Foodsharing_app.Exceptions;
 using Foodsharing_app.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Foodsharing_app.Filters
@@ -19,13 +21,15 @@ namespace Foodsharing_app.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var authenticationHeader = context.HttpContext.Request.Headers["Authorization"];
-            if (string.IsNullOrEmpty(authenticationHeader))
-            {
-                throw new UserNotAuthorizedException("No Authorization header found in request");
-            }
-
-            _authorizationService.AuthorizeUser(authenticationHeader);
+            var authorizationHeader = AuthorizationService.GetAuthorizationHeaderFromFilterContext(context);
+            _authorizationService.AuthorizeUser(authorizationHeader);
+        }
+    }
+    
+    public class AuthorizedUser : ServiceFilterAttribute
+    {
+        public AuthorizedUser() : base(typeof(UserAuthorizationFilter))
+        {
         }
     }
 }

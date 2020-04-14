@@ -5,6 +5,7 @@ using Foodsharing_app.Models;
 using JWT;
 using JWT.Algorithms;
 using JWT.Serializers;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Foodsharing_app.Services
 {
@@ -23,18 +24,36 @@ namespace Foodsharing_app.Services
             _settings = settings;
         }
 
-        public User AuthorizeUser(string header)
+        public static string GetAuthorizationHeaderFromFilterContext(ActionExecutingContext context)
         {
-            var splitHeader = header.Split(" ");
-            if (splitHeader.Length != 2 || splitHeader[0] != "Bearer")
+            var authorizationHeader = context.HttpContext.Request.Headers["Authorization"];
+            if (string.IsNullOrEmpty(authorizationHeader))
             {
-                throw new UserNotAuthorizedException("Authorization header contains wrong payload");
+                throw new UserNotAuthorizedException("No Authorization header found in request");
             }
 
-            var token = splitHeader[1];
+            return authorizationHeader;
+        }
+
+        public User AuthorizeAdmin(string header)
+        {
+            var user = AuthorizeUser(header);
+            if (!user.Admin)
+            {
+                throw new UserNotAuthorizedException(user.Name, "User is not an admin");
+            }
+
+            return user;
+        }
+
+        public User AuthorizeUser(string header)
+        {
+            var token = GetTokenFromHeader(header);
             var decodedTokenPayload = DecodeAuthToken(token);
             ValidateToken(decodedTokenPayload);
-            return _userService.Get(decodedTokenPayload.Subject);
+            var user = _userService.Get(decodedTokenPayload.Subject);
+            ValidateUser(user);
+            return user;
         }
 
         public string Login(string username, string plainTextPassword)
@@ -57,6 +76,18 @@ namespace Foodsharing_app.Services
             ValidateToken(refreshToken);
             var user = _userService.Get(refreshToken.Subject);
             return GenerateAuthToken(user);
+        }
+
+        private static string GetTokenFromHeader(string header)
+        {
+            var splitHeader = header.Split(" ");
+            if (splitHeader.Length != 2 || splitHeader[0] != "Bearer")
+            {
+                throw new UserNotAuthorizedException("Authorization header contains wrong payload");
+            }
+
+            var token = splitHeader[1];
+            return token;
         }
 
         private string GenerateRefreshToken(string userId)
@@ -95,6 +126,15 @@ namespace Foodsharing_app.Services
             if (!isTokenValid)
             {
                 throw new UserNotAuthorizedException("JWT payload could not be validated");
+            }
+        }
+
+        private void ValidateUser(User user)
+        {
+            var isUserValid = user.Active;
+            if (!isUserValid)
+            {
+                throw new UserNotAuthorizedException("User could not be validated");
             }
         }
 

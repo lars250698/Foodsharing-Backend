@@ -9,7 +9,7 @@ namespace Foodsharing_app.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [ServiceFilter(typeof(UserAuthorizationFilter))]
+    [AuthorizedUser]
     public class FoodItemController : Controller
     {
         private readonly FoodItemService _foodItemService;
@@ -27,10 +27,6 @@ namespace Foodsharing_app.Controllers
             return item;
         }
 
-        [HttpGet]
-        public List<FoodItem> GetAll() =>
-            _foodItemService.Get();
-
         [HttpGet("{id}")]
         public FoodItem GetById([FromRoute] string id) =>
             _foodItemService.Get(id);
@@ -46,5 +42,10 @@ namespace Foodsharing_app.Controllers
         [HttpGet("byUser")]
         public List<FoodItem> GetByUser([FromQuery] string userId) =>
             _foodItemService.GetByUser(userId);
+        
+        [HttpGet]
+        [AuthorizedAdmin]
+        public List<FoodItem> GetAll() =>
+            _foodItemService.Get();
     }
 }

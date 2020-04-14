@@ -19,31 +19,7 @@ namespace Foodsharing_app.Services
         {
             _items = databaseService.Database.GetCollection<User>(settings.UsersCollectionName);
         }
-
-        public List<User> Get() =>
-            _items.Find(item => true).ToList();
-
-        public User Get(string id) =>
-            _items.Find(item => item.Id == id).FirstOrDefault();
-
-        public User GetByUsername(string name) =>
-            _items.Find(item => item.Name == name).FirstOrDefault();
-
-        public User Create(User user)
-        {
-            _items.InsertOne(user);
-            return user;
-        }
-
-        public void Update(string id, User user) =>
-            _items.ReplaceOne(item => item.Id == id, user);
-
-        public void Remove(User user) =>
-            _items.DeleteOne(item => item.Id == user.Id);
-
-        public void Remove(string id) =>
-            _items.DeleteOne(item => item.Id == id);
-
+        
         public bool ActivateUser(string id, string activationToken)
         {
             var user = Get(id);
@@ -55,6 +31,12 @@ namespace Foodsharing_app.Services
             }
 
             return tokenCorrect;
+        }
+
+        public void ChangePassword(User user, string newPlainTextPassword)
+        {
+            user.HashedPassword = HashPassword(newPlainTextPassword);
+            Update(user.Id, user);
         }
 
         public static bool PasswordIsCorrect(User user, string password) =>
@@ -86,5 +68,29 @@ namespace Foodsharing_app.Services
             user.ActivationToken = GenerateActivationToken(user);
             return Create(user);
         }
+
+        public List<User> Get() =>
+            _items.Find(item => true).ToList();
+
+        public User Get(string id) =>
+            _items.Find(item => item.Id == id).FirstOrDefault();
+
+        public User GetByUsername(string name) =>
+            _items.Find(item => item.Name == name).FirstOrDefault();
+
+        public User Create(User user)
+        {
+            _items.InsertOne(user);
+            return user;
+        }
+
+        public void Update(string id, User user) =>
+            _items.ReplaceOne(item => item.Id == id, user);
+
+        public void Remove(User user) =>
+            _items.DeleteOne(item => item.Id == user.Id);
+
+        public void Remove(string id) =>
+            _items.DeleteOne(item => item.Id == id);
     }
 }
